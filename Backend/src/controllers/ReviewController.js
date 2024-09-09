@@ -25,3 +25,13 @@ exports.createReview = async (req, res) => {
     }
   };
   
+
+exports.getReview = async (req, res) => {
+  try {
+    const reviews = await Review.find().sort({ createdAt: -1 });
+    res.status(200).json(reviews);
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};

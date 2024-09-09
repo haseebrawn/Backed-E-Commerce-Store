@@ -21,6 +21,6 @@ const storage = multer.diskStorage({
 // Reviews
 // router.get('/getReviews', reviewController.getAllReviews);
 router.post('/reviews', upload.single('media'), reviewController.createReview);
-
+router.get('/reviews', reviewController.getReview);
 
 module.exports = router;
