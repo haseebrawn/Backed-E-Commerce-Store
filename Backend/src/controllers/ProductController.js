@@ -89,7 +89,7 @@ exports.getProductById = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         status: 'fail',
-        message: 'User not found'
+        message: 'Product not found'
       });
     }
     res.status(200).json({

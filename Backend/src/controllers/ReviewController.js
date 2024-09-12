@@ -28,8 +28,14 @@ exports.createReview = async (req, res) => {
 
 exports.getReview = async (req, res) => {
   try {
-    const reviews = await Review.find().sort({ createdAt: -1 });
-    res.status(200).json(reviews);
+  //  const {id} = req.params;
+    const reviews = await Review.find();
+    res.status(200).json({
+      status: 'success',
+      data: {
+        review: reviews
+      }
+    });
   } catch (error) {
     console.error('Error fetching reviews:', error);
     res.status(500).json({ message: 'Server Error' });

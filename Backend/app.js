@@ -23,7 +23,7 @@ app.use('/api/order', orderRoutes);
 // category Route
 app.use('/api/product', categoryRoutes);
 // review Route
-app.use('/api/product', reviewRoutes);
+app.use('/api/review', reviewRoutes);
 // Bundle Deals Route
 app.use('/api/deal', dealRoutes);
 // user Route
