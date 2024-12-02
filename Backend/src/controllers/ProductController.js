@@ -1,3 +1,4 @@
+const slugify = require('slugify');
 const Product = require('../models/ProductModel');
 
 exports.createProduct = async (req, res) => {
@@ -23,8 +24,22 @@ exports.createProduct = async (req, res) => {
       return res.status(400).json({ message: 'Invalid sizes data' });
     }
 
+    // Generate a slug from the product name
+    let slug = slugify(name, { lower: true, strict: true });
+
+    // Check if the slug already exists
+    let existingProduct = await Product.findOne({ slug });
+    let counter = 1;
+
+    // If the slug exists, make it unique by appending a number to it
+    while (existingProduct) {
+      slug = `${slugify(name, { lower: true, strict: true })}-${counter}`;
+      existingProduct = await Product.findOne({ slug });
+      counter++;
+    }
+
     // Save the image path to the database
-    const imagePath = '/uploads/productImages/' + images.filename; // Assuming images are stored in the public/uploads directory
+    const imagePath = '/uploads/productImages/' + images.filename;
 
     const newProduct = new Product({
       name,
@@ -34,11 +49,11 @@ exports.createProduct = async (req, res) => {
       regularprice,
       images: imagePath,
       sizes: parsedSizes,
+      slug,  // Add the generated slug to the product
     });
 
     // Save the product to the database
     await newProduct.save();
-    // console.log("newProduct", newProduct);
 
     res.status(201).json(newProduct);
   } catch (error) {
@@ -46,6 +61,7 @@ exports.createProduct = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
 
 // Get Products
 exports.getAllProducts = async (req, res) => {
@@ -82,26 +98,29 @@ exports.getProductCount = async (req, res) => {
   }
 };
 
-// controllers/userController.js
-exports.getProductById = async (req, res) => {
+// // controllers/userController.js
+// exports.getProductByName = async (req, res) => {
+//   try {
+//     const product = await Product.findOne({ name: req.params.name.toLowerCase() });
+//     if (!product) {
+//       return res.status(404).json({ message: "Product not found" });
+//     }
+//     res.status(200).json({ data: product });
+//   } catch (error) {
+//     res.status(500).json({ message: "Server error", error });
+//   }
+// };
+
+exports.getProductBySlug = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findOne({ slug: req.params.slug });
+    
     if (!product) {
-      return res.status(404).json({
-        status: 'fail',
-        message: 'Product not found'
-      });
+      return res.status(404).json({ message: "Product not found" });
     }
-    res.status(200).json({
-      status: 'success',
-      data: {
-        product
-      }
-    });
+    res.status(200).json({ data: { product } });
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message
-    });
+    res.status(500).json({ message: "Server error" });
   }
 };
+

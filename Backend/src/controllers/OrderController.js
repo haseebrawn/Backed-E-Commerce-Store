@@ -4,52 +4,53 @@ const Product = require("../models/ProductModel");
 exports.createOrder = async (req, res) => {
   try {
     const { productId, sizes } = req.body;
+    const userId = req.user._id; // Ensure user is logged in
 
-    // Ensure required fields are present
+    if (!userId) {
+      return res.status(401).json({ message: "User not logged in" });
+    }
+
     if (!productId || !sizes || !Array.isArray(sizes) || sizes.length === 0) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Find the product
     const foundProduct = await Product.findById(productId);
     if (!foundProduct) {
       return res.status(404).json({ message: "Product not found" });
     }
 
     let totalPrice = 0;
-    let updatedSizes = foundProduct.sizes.map((ps) => {
+    const updatedSizes = foundProduct.sizes.map((ps) => {
       const orderSize = sizes.find((size) => size.size === ps.name);
       if (orderSize) {
         if (orderSize.quantity > ps.quantity) {
           throw new Error(`Insufficient quantity for size ${ps.name}`);
         }
-        // Calculate total price based on size price and quantity
         totalPrice += (ps.price || 0) * orderSize.quantity;
-        // Reduce the quantity in the product
         ps.quantity -= orderSize.quantity;
       }
       return ps;
     });
-    updatedSizes = updatedSizes.filter((size) => size.quantity > 0);
-    // Create the order
+
     const newOrder = new Order({
+      userId,
       productId,
       quantity: sizes.reduce((acc, size) => acc + size.quantity, 0),
       totalPrice,
       sizes,
     });
 
-    // Save the updated product
-    foundProduct.sizes = updatedSizes;
+    foundProduct.sizes = updatedSizes.filter((size) => size.quantity > 0);
     await foundProduct.save();
-    // Save the order to the database
     await newOrder.save();
+
     res.status(201).json(newOrder);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };
+
 
 exports.getUserOrders = async (req, res) => {
   try {
@@ -147,11 +148,12 @@ exports.getOrderById = async (req, res) => {
 // Update Order Status
 exports.updateOrderStatus = async (req, res) => {
   try {
-    const { status } = req.body;
     const { id } = req.params;
+    const { status } = req.body;
+    
 
     if (!status) {
-      return res.status(400).json({ message: "Missing required fields" });
+      return res.status(400).json({ message: "Missing required field" });
     }
     const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
 

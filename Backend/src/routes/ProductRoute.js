@@ -22,6 +22,8 @@ router.post('/products', upload.single("images"), ProductController.createProduc
 router.get('/getProducts', ProductController.getAllProducts)
 // New route to get the count of products
 router.get('/countProduct', ProductController.getProductCount);
-router.get('/:id', ProductController.getProductById);
+// router.get('/:name', ProductController.getProductByName);
+router.get('/:slug', ProductController.getProductBySlug);
+
 
 module.exports = router;
