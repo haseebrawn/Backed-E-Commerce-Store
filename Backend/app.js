@@ -9,6 +9,7 @@ const cartRoutes = require('./src/routes/CartRoute');
 const orderRoutes = require('./src/routes/OrderRoute');
 const contactFormRoutes = require('./src/routes/ContactFormRoute');
 const stripeRoutes = require ('./src/routes/StripeRoute');
+const orderSuccessRoutes = require('./src/routes/OrderSuccessRoute');
 const app = express();
 const cors = require('cors');
 
@@ -35,6 +36,9 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/contactform', contactFormRoutes);
 // Stripe Routes
 app.use('/api/stripe', stripeRoutes);
+
+// OrderSuccess Route 
+app.use('/api/ordersuccess', orderSuccessRoutes);
 
 
 app.use("/uploads", express.static("uploads"));

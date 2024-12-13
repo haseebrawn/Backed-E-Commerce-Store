@@ -3,7 +3,7 @@ const Product = require("../models/ProductModel");
 
 exports.createOrder = async (req, res) => {
   try {
-    const { productId, sizes } = req.body;
+    const { productId, sizes, stripeSessionId } = req.body;
     const userId = req.user._id; // Ensure user is logged in
 
     if (!userId) {
@@ -38,6 +38,7 @@ exports.createOrder = async (req, res) => {
       quantity: sizes.reduce((acc, size) => acc + size.quantity, 0),
       totalPrice,
       sizes,
+      stripeSessionId,
     });
 
     foundProduct.sizes = updatedSizes.filter((size) => size.quantity > 0);
