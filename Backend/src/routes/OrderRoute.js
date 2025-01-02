@@ -11,7 +11,8 @@ router.post('/', OrderController.createOrder);
 // Get all orders
 router.get('/', OrderController.getAllOrders);
 
-router.get('/user/orders', verifyToken, OrderController.getUserOrders);
+router.get('/user/orders/:userId',verifyToken, OrderController.getUserOrders);
+
 
 // Get All OrderCount
 router.get('/orderCount', OrderController.countOrder);

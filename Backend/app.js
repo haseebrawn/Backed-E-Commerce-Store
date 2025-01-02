@@ -5,6 +5,7 @@ const categoryRoutes = require('./src/routes/CategoryRoute');
 const reviewRoutes = require('./src/routes/ReviewRoute');
 const dealRoutes = require('./src/routes/DealsRoute');
 const userRoutes = require('./src/routes/UserRoute');
+const adminRoutes = require('./src/routes/AdminRoutes');
 const cartRoutes = require('./src/routes/CartRoute');
 const orderRoutes = require('./src/routes/OrderRoute');
 const contactFormRoutes = require('./src/routes/ContactFormRoute');
@@ -30,6 +31,8 @@ app.use('/api/review', reviewRoutes);
 app.use('/api/deal', dealRoutes);
 // user Route
 app.use('/api/users', userRoutes);
+// Admin Routes
+app.use('/api/admin', adminRoutes);
 // cart Route
 app.use('/api/cart', cartRoutes); 
 // Contact Form Route

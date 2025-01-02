@@ -20,10 +20,8 @@ const transporter = nodemailer.createTransport({
 exports.createCheckoutSession = async (req, res) => {
   const { userId, productId, sizes, totalPrice } = req.body; // userId provided
 
-  if (!totalPrice || !userId) {
-    return res
-      .status(400)
-      .json({ error: "Total Price and User ID are required" });
+  if (!totalPrice || !userId || !productId || !sizes || sizes.length === 0) {
+    return res.status(400).json({ error: "All fields (userId, productId, sizes, totalPrice) are required." });
   }
 
   try {

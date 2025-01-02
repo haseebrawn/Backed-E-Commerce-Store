@@ -55,19 +55,27 @@ exports.createOrder = async (req, res) => {
 
 exports.getUserOrders = async (req, res) => {
   try {
-    const userId = req.user._id; // Get user ID from the authenticated user
+
+    if (!req.user || !req.user._id) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'User not authenticated',
+      });
+    }
+    
+    const userId = req.user._id; // Assuming `req.user` contains authenticated user info
 
     // Fetch orders for the authenticated user
     const orders = await Order.find({ userId }).populate({
       path: 'productId',
-      select: 'name description price category images',
+      select: 'name images',
     });
 
-    // Add tracking ID and customer name to each order
+    // Format the orders
     const ordersWithTrackingId = orders.map(order => ({
-      ...order._doc, // Spread the order document
-      trackingId: `TRACK-${order._id.toString().slice(-8)}`, // Generate tracking ID based on order ID
-      customer: req.user.name // Add customer name from logged-in user
+      ...order._doc, // Copy order fields
+      trackingId: `TRACK-${order._id.toString().slice(-8)}`, // Generate tracking ID
+      customer: req.user.name, // Get customer name
     }));
 
     res.status(200).json({
@@ -78,10 +86,11 @@ exports.getUserOrders = async (req, res) => {
     console.error(err);
     res.status(500).json({
       status: 'fail',
-      message: 'Server error',
+      message: 'Server error while fetching orders',
     });
   }
 };
+
 
 // Get All Orders
 exports.getAllOrders = async (req, res) => {
@@ -221,3 +230,4 @@ exports.countOrder = async (req, res) => {
     });
   }
 };
+
